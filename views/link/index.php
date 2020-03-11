@@ -1,8 +1,9 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
+use kartik\export\ExportMenu;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\LinkSearch */
@@ -10,6 +11,36 @@ use yii\widgets\Pjax;
 
 $this->title = 'Links';
 $this->params['breadcrumbs'][] = $this->title;
+
+$gridColumns = [
+    ['class' => 'yii\grid\SerialColumn'],
+
+    'date' => [
+        'attribute' => 'date',
+        'filter' => false,
+    ],
+    'favicon' => [
+        'attribute' => 'favicon',
+        'filter' => false,
+        'enableSorting' => false,
+        'format' => 'raw',
+        'content' => fn($model) => $model->favicon ? Html::img('data:image/ico;charset=utf-8;base64,' . base64_encode($model->favicon)) : '',
+    ],
+    'url' => [
+        'attribute' => 'url',
+        'filter' => false,
+    ],
+    'title' => [
+        'attribute' => 'title',
+        'filter' => false,
+        'format' => 'raw',
+    ],
+
+    [
+        'class' => 'yii\grid\ActionColumn',
+        'template' => '{view} {delete}',
+    ],
+];
 ?>
 <div class="link-index">
 
@@ -19,43 +50,16 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Link', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
+    <?= ExportMenu::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => $gridColumns
+    ]); ?>
+
     <?php Pjax::begin(); ?>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
+    <?= GridView::widget(['dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-//            'id',
-            'date' => [
-                'attribute' => 'date',
-                'filter' => false,
-            ],
-            'favicon' => [
-                'attribute' => 'favicon',
-                'filter' => false,
-                'enableSorting' => false,
-                'format' => 'raw',
-                'content' => fn($model) => $model->favicon ? Html::img('data:image/ico;charset=utf-8;base64,' . base64_encode($model->favicon)) : '',
-            ],
-            'url' => [
-                'attribute' => 'url',
-                'filter' => false,
-            ],
-            'title' => [
-                'attribute' => 'title',
-                'filter' => false,
-                'format' => 'raw',
-            ],
-//            'url:url',
-//            'title:ntext',
-            //'metaDescription:ntext',
-            //'metaKeywords:ntext',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+        'columns' => $gridColumns,]); ?>
 
     <?php Pjax::end(); ?>
 
